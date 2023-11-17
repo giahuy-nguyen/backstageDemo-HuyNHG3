@@ -1,5 +1,0 @@
-{
-  "baseUrl": "http://backstageio-alb-653454062.ap-northeast-1.elb.amazonaws.com",
-  "fixturesFolder": false,
-  "pluginsFile": false
-}
