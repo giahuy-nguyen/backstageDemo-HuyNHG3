@@ -1,9 +1,9 @@
 app:
-  title: Scaffolded Backstage App
-  baseUrl:
+  title: Backstage App
+  baseUrl: http://localhost:7000
 
 organization:
-  name: FPT-HUYNHG3
+  name: Backstage
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
@@ -12,39 +12,47 @@ backend:
   # auth:
   #   keys:
   #     - secret: ${BACKEND_SECRET}
-  baseUrl:
+  baseUrl: http://localhost:7000
   listen:
-    port: 7007
+    port: 7000
     # Uncomment the following host directive to bind to specific interfaces
     # host: 127.0.0.1
   csp:
+    upgrade-insecure-requests: false
     connect-src: ["'self'", "http:", "https:"]
     # Content-Security-Policy directives follow the Helmet format: https://helmetjs.github.io/#reference
     # Default Helmet Content-Security-Policy values can be removed by setting the key to false
   cors:
-    origin: ${APP_DOMAIN}
+    origin: http://backstageio-alb-2095845814.ap-northeast-1.elb.amazonaws.com
     methods: [GET, HEAD, PATCH, POST, PUT, DELETE]
     credentials: true
   # This is for local development only, it is not recommended to use this in production
   # The production database configuration is stored in app-config.production.yaml
   database:
-    client: pg
-    connection:
-      host: ${POSTGRES_HOST}
-      port: ${POSTGRES_PORT}
-      user: ${POSTGRES_USER}
-      password: ${POSTGRES_PASSWORD}
+    client: better-sqlite3
+    connection: ":memory:"
+    # client: pg
+    # connection:
+    #   host: ${POSTGRES_HOST}
+    #   port: ${POSTGRES_PORT}
+    #   user: ${POSTGRES_USER}
+    #   password: ${POSTGRES_PASSWORD}
+  # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
   github:
     - host: github.com
       # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
       # about setting up the GitHub integration here: https://backstage.io/docs/getting-started/configuration#setting-up-a-github-integration
-      token: ${GITHUB_TOKEN}
+      token: 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
     ### Example for how to add your GitHub Enterprise instance using the API:
     # - host: ghe.example.net
     #   apiBaseUrl: https://ghe.example.net/api/v3
     #   token: ${GHE_TOKEN}
+
+  # accounts:
+  #   - accountId: ""
+  #     roleName: "
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -65,29 +73,42 @@ techdocs:
   publisher:
     type: "awsS3"
     awsS3:
-      bucketName: ${BUCKET_NAME}
-      region: ${DEFAULT_REGION}
+      bucketName: huybucketbackstage
+      region: ap-northeast-1
       credentials:
-        accessKeyId: ${ACCESS_KEY_ID}
-        secretAccessKey: ${SECRET_ACCESS_KEY}
+        accessKeyId: AKIAZZPEPGUTI6MQIQB5
+        secretAccessKey: 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
+        sse: "aws:kms"
+# techdocs:
+#   builder: 'external'
+#   generators:
+#     techdocs: 'local'
+#   publisher:
+#     type: 'awsS3'
+#     awsS3:
+#       bucketName: ${BUCKET_NAME}
+#       region: ${DEFAULT_REGION}
+#       credentials:
+#         accessKeyId: ${ACCESS_KEY_ID}
+#         secretAccessKey: ${SECRET_ACCESS_KEY}
+
 auth:
-  environment: development
+  # see https://backstage.io/docs/auth/ to learn about auth providers
   providers:
     github:
       development:
-        clientId: ${AUTH_GITHUB_CLIENT_ID}
-        clientSecret: ${AUTH_GITHUB_CLIENT_SECRET}
+        clientId: 27a032142e0da878e3c3
+        clientSecret: fbf96b460cb580ec808e88c6f6a93bab2e01d51c
 
 scaffolder:
-  github:
-    visibility: private
+  # see https://backstage.io/docs/features/software-templates/configuration for software template options
 
 catalog:
   import:
     entityFilename: catalog-info.yaml
     pullRequestBranchName: backstage-integration
   rules:
-    - allow: [Component, System, API, Resource, Location, Group, User]
+    - allow: [Component, System, API, Resource, Location, Template]
   locations:
     # Local example data, file locations are relative to the backend process, typically `packages/backend`
     - type: file
@@ -106,11 +127,11 @@ catalog:
         - allow: [User, Group]
 
     ## Uncomment these lines to add more example data
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
 
-    ## Uncomment these lines to add an example org
-    # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
-    #   rules:
-    #     - allow: [User, Group]
+    # Uncomment these lines to add an example org
+    - type: url
+      target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
+      rules:
+        - allow: [User, Group]
